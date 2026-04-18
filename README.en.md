@@ -23,7 +23,7 @@ Don't use for: proofreading, translation, debugging, or tasks with no human deci
 ## Install
 
 ```bash
-git clone https://github.com/yourname/human-os-backdoor ~/.claude/skills/human-os
+git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 ```
 
 Or copy `skills/human-os/` into your Claude Code skills directory.

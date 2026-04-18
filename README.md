@@ -23,7 +23,7 @@
 ## 安装
 
 ```bash
-git clone https://github.com/yourname/human-os-backdoor ~/.claude/skills/human-os
+git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 ```
 
 或把 `skills/human-os/` 手动复制到你的 Claude Code skills 目录。

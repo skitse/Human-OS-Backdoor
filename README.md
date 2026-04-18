@@ -1,159 +1,168 @@
 # Human OS: Backdoor
 
-A Claude Code skill for behavioral design — built on the idea that humans run an OS, and you can reverse-engineer it.
+**行为设计技能 · 为 Claude Code 构建**
 
-Not a manipulation toolkit. A structured way to apply behavioral science where it actually matters: onboarding, conversion, retention, pricing, content, community, and growth.
+> 人类跑着一套操作系统。这个 skill 是逆向工程工具。
 
----
-
-## What this is
-
-When you're designing a flow, writing copy, or auditing a product, the behavioral layer is usually handled by instinct. This skill makes it explicit — naming the mechanisms, showing how they interact, flagging when they're being misused.
-
-It works as a **Claude Code skill**: drop it in, and Claude routes behavioral design tasks through a structured reference system instead of relying on vibes.
+[English](README.en.md)
 
 ---
 
-## Install
+## 这是什么
+
+当你在设计流程、写文案、或审查产品时，行为设计那层通常靠直觉处理。这个 skill 让它变成显式的——命名机制、展示组合效果、标记滥用风险。
+
+它作为 **Claude Code skill** 运行：装好之后，Claude 会把涉及人类决策设计的任务路由到一套结构化的参考体系，而不是靠感觉回答。
+
+适用场景：产品 onboarding、转化、留存、定价、内容、社区、增长。
+
+不适用场景：纯写作润色、翻译、代码调试、没有决策设计成分的问题。
+
+---
+
+## 安装
 
 ```bash
-# Clone into your Claude Code skills directory
 git clone https://github.com/yourname/human-os-backdoor ~/.claude/skills/human-os
 ```
 
-Or copy `skills/human-os/` into wherever you keep your Claude Code skills.
+或把 `skills/human-os/` 手动复制到你的 Claude Code skills 目录。
 
-Claude Code will pick it up automatically on the next session.
-
----
-
-## Usage
-
-The skill activates automatically when a task involves human decision design. You can also invoke modes explicitly:
-
-| Mode | What it does |
-|------|-------------|
-| *(none)* | Adaptive — light touch for small tasks, full stack for complex ones |
-| `/stealth` | Applies the skill silently, no visible mechanics |
-| `/scan` | Shows the behavioral scan before designing |
-| `/deep` | Full drill: scan + mechanisms + risks + rollout notes |
-| `/combo` | Focuses on mechanism combinations and interaction effects |
-| `/defend` | Adds abuse checks and trust-preserving alternatives |
-
-**Examples:**
-
-```
-Design an onboarding flow for a habit-tracking app /deep
-```
-
-```
-Critique this pricing page /scan
-```
-
-```
-Rewrite this CTA for loss aversion /stealth
-```
-
-```
-Audit this retention loop for dark patterns /defend
-```
+下次会话 Claude Code 自动加载。
 
 ---
 
-## What's inside
+## 用法
 
-### Cognitive models (`references/models/`)
+涉及人类决策设计的任务会自动触发。也可以手动指定模式：
 
-Nine models covering how people actually process, decide, and act:
+| 模式 | 触发词 | 效果 |
+|------|--------|------|
+| 自适应 | *(不指定)* | 小任务轻触，复杂任务展开全栈 |
+| `/stealth` 隐身 | `/stealth` 或 `隐身` | 静默应用，不显示机制标注 |
+| `/scan` 扫描 | `/scan` 或 `扫描` | 先出行为机会扫描，再给设计 |
+| `/deep` 深度 | `/deep` 或 `深度` | 完整流程：扫描 + 机制 + 风险 + 上线建议 |
+| `/combo` 组合 | `/combo` 或 `组合` | 聚焦机制组合与交互效应 |
+| `/defend` 防御 | `/defend` 或 `防御` | 加入滥用检查和保护用户信任的替代方案 |
 
-- `cognitive-architecture` — dual process, cognitive load, predictive coding
-- `heuristics-biases` — anchoring, loss aversion, defaults, decoy, sunk cost
-- `social-dynamics` — social proof, reciprocity, authority, conformity
-- `affective-dynamics` — Zeigarnik, curiosity, variable reward, flow
-- `motivation-regulation` — habits, identity, implementation intentions, streaks
-- `perception-attention` — fluency, pattern interrupt, visual hierarchy
-- `attention-economics` — notification budgets, channel fatigue, novelty decay
-- `trust-architecture` — trust formation, digital credibility signals, repair
-- `pricing-economic-decisions` — payment pain, mental accounting, willingness-to-pay
+**示例：**
 
-### Domain playbooks (`references/domain-playbooks/`)
+```
+设计一个习惯追踪 App 的 onboarding 流程 /deep
+```
 
-Fourteen applied contexts:
+```
+帮我审查这个定价页面 /scan
+```
+
+```
+用损失厌恶重写这个 CTA /stealth
+```
+
+```
+检查这个留存循环有没有黑暗模式 /defend
+```
+
+---
+
+## 知识库结构
+
+### 认知模型 (`references/models/`)
+
+9 个模型，覆盖人的信息处理、决策和行动机制：
+
+| 文件 | 内容 |
+|------|------|
+| `cognitive-architecture` | 双系统、认知负荷、预测编码 |
+| `heuristics-biases` | 锚定、损失厌恶、默认效应、诱饵、沉没成本 |
+| `social-dynamics` | 社会证明、互惠、权威、从众 |
+| `affective-dynamics` | 蔡加尼克、好奇心、可变奖励、心流 |
+| `motivation-regulation` | 习惯、身份认同、执行意图、进度感 |
+| `perception-attention` | 流畅性、模式中断、视觉层级 |
+| `attention-economics` | 通知预算、渠道疲劳、新奇衰减 |
+| `trust-architecture` | 信任形成、数字信任信号、信任修复 |
+| `pricing-economic-decisions` | 支付痛苦、心理账户、支付意愿塑造 |
+
+### 领域 Playbook (`references/domain-playbooks/`)
+
+14 个应用场景：
 
 `saas-products` · `social-commerce` · `viral-growth-loops` · `games-gamification` · `community-social` · `content-hooks` · `video-content-psychology` · `linguistic-triggers` · `cultural-psychology` · `sales-psychology` · `interpersonal-persuasion` · `meme-engineering` · `behavioral-finance` · `dark-patterns`
 
-### Supporting references
+### 辅助参考
 
-- `combo-patterns` — 17 high-leverage mechanism combinations with real product examples
-- `anti-patterns` — what looks like a bias but isn't, and design moves that backfire
-- `scan-protocol` — the behavioral opportunity scan used in `/scan` and `/deep` modes
-- `model-index` — fast candidate selection when you know the domain but not the mechanism
-- `dialogues/` — cross-disciplinary debates (neuroscience × growth, sales × narrative)
-
----
-
-## Task tiers
-
-The skill classifies every task before doing anything:
-
-| Tier | Scope | Example |
-|------|-------|---------|
-| T0 | No behavioral layer needed | "fix this typo" |
-| T1 | One narrow decision point | rewrite a single CTA |
-| T2 | One bounded flow or artifact | onboarding sequence, pricing page |
-| T3 | Multi-step system or high-stakes context | full retention loop, fintech product |
-
-Effort scales with tier. T1 gets one mechanism and a short note. T3 gets the full scan, risks, and safe rollout considerations.
+| 文件 | 用途 |
+|------|------|
+| `combo-patterns` | 17 个高杠杆机制组合，含真实产品案例 |
+| `anti-patterns` | 被误读为偏差的适应性特征，以及会反噬的设计动作 |
+| `scan-protocol` | `/scan` 和 `/deep` 模式使用的行为机会扫描协议 |
+| `model-index` | 快速候选机制定位索引 |
+| `dialogues/` | 跨领域辩论（神经科学 × 增长黑客；销售心理 × 叙事心理） |
 
 ---
 
-## Safety gate
+## 任务分级
 
-Every request goes through a gate before any output is produced.
+每个请求在输出前先分级：
 
-The skill refuses or redirects requests that involve fake scarcity, fake social proof, hidden consent, deliberate addiction loops, or coercion of vulnerable users. When the goal is legitimate but the tactic isn't, it rewrites into a transparent alternative.
+| 级别 | 范围 | 示例 |
+|------|------|------|
+| T0 | 不需要行为层 | 改个错别字 |
+| T1 | 单点决策 | 重写一个 CTA |
+| T2 | 单个有边界的流程或产物 | onboarding 序列、定价页面 |
+| T3 | 多步骤系统或高风险场景 | 完整留存循环、金融产品 |
 
-High-stakes domains — health, finance, children, crisis — get extra scrutiny regardless of tier.
-
-This isn't decorative. See `references/anti-patterns.md` and `references/domain-playbooks/dark-patterns.md` for what gets flagged and why.
+投入随级别缩放。T1 给一个机制加一段短注。T3 给完整扫描、风险和上线注意事项。
 
 ---
 
-## Eval harness
+## 安全门
 
-The `harness/` directory contains a [promptfoo](https://promptfoo.dev)-based evaluation suite:
+每个请求在产出前都会过一道门。
+
+以下情况会拒绝或改写：假稀缺、假社会证明、隐式同意、故意成瘾循环、对弱势用户施压。当目标合理但手段不合理时，改写成透明的替代方案。
+
+健康、金融、儿童、危机等高风险场景，无论级别如何都会额外审查。
+
+详见 `references/anti-patterns.md` 和 `references/domain-playbooks/dark-patterns.md`。
+
+---
+
+## Eval 测试套件
+
+`harness/` 目录包含基于 [promptfoo](https://promptfoo.dev) 的评测套件：
 
 ```bash
-# Run smoke checks (no API key needed)
+# 静态检查（不需要 API Key）
 python3 harness/scripts/run_all_checks.py
 
-# Verify the skill is correctly packaged
+# 验证 skill 打包是否完整
 python3 harness/scripts/check_packaged_skill.py
 
-# Full eval (requires ANTHROPIC_API_KEY or OPENAI_API_KEY)
+# 完整评测（需要 ANTHROPIC_API_KEY 或 OPENAI_API_KEY）
 python3 harness/scripts/run_eval.py
 ```
 
-The harness tests tier classification, mode behavior, safety gate decisions, and reference routing against ~30 labeled cases.
+测试覆盖：级别分类、模式行为、安全门决策、参考文件路由，约 30 个标注 case。
 
 ---
 
-## What this is not
+## 这不是什么
 
-- Not a prompt injection tool
-- Not a dark pattern generator
-- Not a replacement for actually understanding your users
-- Not a guarantee that any of this will work on your specific product
+- 不是提示词注入工具
+- 不是黑暗模式生成器
+- 不能替代真正理解你的用户
+- 不保证任何机制对你的具体产品有效
 
-Behavioral science gives you the mechanism. Whether it applies to your context is still a judgment call.
+行为科学给你机制。机制是否适用于你的场景，仍然是判断题。
 
 ---
 
-## Structure
+## 目录结构
 
 ```
 .
-├── SKILL.md                        # Skill definition (entry point for Claude Code)
+├── SKILL.md                        # Skill 定义（Claude Code 入口）
 ├── skills/
 │   └── human-os/
 │       ├── SKILL.md
@@ -162,10 +171,10 @@ Behavioral science gives you the mechanism. Whether it applies to your context i
 │           ├── scan-protocol.md
 │           ├── anti-patterns.md
 │           ├── combo-patterns.md
-│           ├── models/             # 9 cognitive model files
-│           ├── domain-playbooks/   # 14 applied context files
-│           └── dialogues/          # 2 cross-disciplinary debate files
-└── harness/                        # Eval suite
+│           ├── models/             # 9 个认知模型
+│           ├── domain-playbooks/   # 14 个领域 playbook
+│           └── dialogues/          # 2 个跨领域辩论文件
+└── harness/                        # Eval 测试套件
     ├── tests/
     ├── scripts/
     └── promptfooconfig.yaml

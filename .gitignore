@@ -16,5 +16,5 @@ results/
 # Local skill lock (contains absolute paths)
 skills-lock.json
 
-# Redundant root-level references copy
-references/
+# Redundant root-level references copy (skills/human-os/references/ is intentional)
+/references/

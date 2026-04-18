@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Human OS smoke harness"
+
+prompts:
+  - file://prompts/system.md
+
+providers:
+  - echo
+
+tests: file://tests/smoke-cases.yaml
+
+commandLineOptions:
+  maxConcurrency: 1
+
+defaultTest:
+  options:
+    transform: output.trim()
+  assert:
+    - type: python
+      value: file://scripts/assertions.py:smoke_assert
+
+outputPath: results/human-os-smoke.json

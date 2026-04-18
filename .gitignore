@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Test outputs
+results/
+
+# Local Claude Code config & installation
+.claude/
+.agents/
+
+# Local skill lock (contains absolute paths)
+skills-lock.json
+
+# Redundant root-level references copy
+references/

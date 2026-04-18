@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Human OS semantic harness (OpenAI)"
+
+prompts:
+  - file://prompts/system.md
+
+providers:
+  - id: openai:gpt-4.1
+    label: gpt-4.1
+
+tests: file://tests/cases.yaml
+
+commandLineOptions:
+  maxConcurrency: 1
+
+defaultTest:
+  options:
+    transform: output.trim()
+  assert:
+    - type: python
+      value: file://scripts/assertions.py:decision_contract_assert
+
+outputPath: results/human-os-eval-openai.json

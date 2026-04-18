@@ -1,0 +1,4 @@
+- description: "Smoke render"
+  vars:
+    skill_md: file://../SKILL.md
+    user_request: "Review our onboarding flow for behavior design opportunities."

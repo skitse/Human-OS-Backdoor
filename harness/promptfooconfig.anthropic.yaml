@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Human OS semantic harness (Anthropic)"
+
+prompts:
+  - file://prompts/system.md
+
+providers:
+  - id: anthropic:messages:claude-sonnet-4-6
+    label: claude-sonnet-4-6
+
+tests: file://tests/cases.yaml
+
+commandLineOptions:
+  maxConcurrency: 1
+
+defaultTest:
+  options:
+    transform: output.trim()
+  assert:
+    - type: python
+      value: file://scripts/assertions.py:decision_contract_assert
+
+outputPath: results/human-os-eval-anthropic.json

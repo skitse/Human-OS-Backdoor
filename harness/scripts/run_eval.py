@@ -7,8 +7,15 @@ import sys
 
 import yaml
 
-
+# Load .env if present (never required — env vars can also be set externally)
 ROOT = Path(__file__).resolve().parents[2]
+_env_file = ROOT / ".env"
+if _env_file.exists():
+    for line in _env_file.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip())
 HARNESS = ROOT / "harness"
 CASES_PATH = HARNESS / "tests" / "cases.yaml"
 

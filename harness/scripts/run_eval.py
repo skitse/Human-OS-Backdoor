@@ -69,7 +69,18 @@ def main(argv):
     env_var = ENV_REQUIREMENTS[provider]
     if not os.environ.get(env_var):
         print(f"Missing required environment variable: {env_var}")
+        print("Tip: copy .env.example to .env and fill in your key.")
+        print("     Kimi Code: set ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic")
         return 1
+
+    if provider == "anthropic":
+        base_url = os.environ.get("ANTHROPIC_BASE_URL", "")
+        model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+        if base_url:
+            print(f"Provider : Anthropic-compatible ({base_url})")
+        else:
+            print("Provider : Anthropic native")
+        print(f"Model    : {model}")
 
     cases = load_cases()
     selected_cases = filter_cases(cases, filter_key, filter_value)

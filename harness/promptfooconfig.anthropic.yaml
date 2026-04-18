@@ -1,12 +1,14 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: "Human OS semantic harness (Anthropic)"
+description: "Human OS semantic harness (Anthropic / Anthropic-compatible)"
 
 prompts:
   - file://prompts/system.md
 
 providers:
-  - id: anthropic:messages:claude-sonnet-4-6
-    label: claude-sonnet-4-6
+  - id: "anthropic:messages:{{env.ANTHROPIC_MODEL | default('claude-sonnet-4-6')}}"
+    label: "{{env.ANTHROPIC_MODEL | default('claude-sonnet-4-6')}}"
+    config:
+      apiBaseUrl: "{{env.ANTHROPIC_BASE_URL | default('')}}"
 
 tests: file://tests/cases.yaml
 

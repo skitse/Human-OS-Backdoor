@@ -45,7 +45,6 @@ REQUIRED_FILES = [
     ROOT / "references" / "dialogues" / "sales-x-narrative-debate.md",
     ROOT / "references" / "models" / "attention-economics.md",
     ROOT / "references" / "models" / "trust-architecture.md",
-    ROOT / "skills" / "human-os" / "SKILL.md",
 ]
 
 

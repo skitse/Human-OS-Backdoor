@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
-import filecmp
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGE = ROOT / "skills" / "human-os"
-
 
 REQUIRED_PATHS = [
     "SKILL.md",
@@ -47,31 +44,9 @@ REQUIRED_PATHS = [
 def main() -> int:
     failures = []
 
-    if not PACKAGE.exists():
-        failures.append("missing packaged skill directory: skills/human-os")
-    else:
-        for rel in REQUIRED_PATHS:
-            if not (PACKAGE / rel).exists():
-                failures.append(f"missing packaged file: skills/human-os/{rel}")
-
-    if PACKAGE.exists():
-        root_skill = ROOT / "SKILL.md"
-        packaged_skill = PACKAGE / "SKILL.md"
-        if packaged_skill.exists() and root_skill.read_text() != packaged_skill.read_text():
-            failures.append("packaged SKILL.md differs from root SKILL.md")
-
-        root_refs = ROOT / "references"
-        packaged_refs = PACKAGE / "references"
-        if packaged_refs.exists():
-            diff = [
-                item
-                for item in filecmp.dircmp(root_refs, packaged_refs).left_only
-                if not item.startswith(".")
-            ]
-            if diff:
-                failures.append(
-                    f"packaged references missing top-level entries from root references: {sorted(diff)}"
-                )
+    for rel in REQUIRED_PATHS:
+        if not (ROOT / rel).exists():
+            failures.append(f"missing required file: {rel}")
 
     if failures:
         print("PACKAGED SKILL CHECK FAILED")

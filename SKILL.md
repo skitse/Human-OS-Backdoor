@@ -1,12 +1,14 @@
 ---
 name: human-os
 description: >-
-  Behavioral design overlay for product, content, offer, UX, community, and growth tasks where
-  shaping human decisions or habits is central. Use when designing or optimizing onboarding,
-  conversion, retention, pricing, social loops, messaging, trust signals, or persuasion
-  mechanics, or when auditing behavioral levers in an existing plan. Do not use for simple
-  rewriting, translation, pure coding/debugging, factual Q&A, or tasks without meaningful human
-  decision design. Modes: /stealth, /scan, /deep, /combo, /defend.
+  Behavioral design overlay applying psychology, cognitive bias, and behavioral economics to
+  product, content, offer, UX, community, and growth tasks. Use when designing or optimizing
+  onboarding, conversion, retention, pricing, social loops, engagement mechanics, messaging,
+  trust signals, nudges, or persuasion mechanics — or when auditing behavioral levers, dark
+  patterns, or growth hacking tactics in an existing plan. Covers user psychology, habit
+  formation, attention economics, social dynamics, and choice architecture. Do not use for
+  simple rewriting, translation, pure coding/debugging, factual Q&A, or tasks without
+  meaningful human decision design. Modes: /stealth, /scan, /deep, /combo, /defend.
 ---
 
 # Human OS
@@ -65,6 +67,11 @@ Examples:
 - pricing page critique
 - referral mechanic
 - retention email sequence
+- checkout reassurance section
+- cultural or market-specific adaptation of a flow
+- trust or credibility redesign for a single surface
+- referral loop design for a single product
+- single-domain behavioral audit (e.g. "audit our onboarding")
 
 ### T3 - System or Risky Design
 
@@ -76,6 +83,9 @@ Examples:
 - pricing system redesign
 - community incentive system
 - finance, health, children, addiction, politics, or other trust-sensitive contexts
+- any request involving fake scarcity, fake urgency, deceptive defaults, or dark patterns
+- any request to design for a vulnerable or captive population
+- audit or defense of a potentially manipulative system
 
 ## Effort Policy
 
@@ -107,12 +117,18 @@ Match effort to tier. Do not default to maximum output.
 
 Promote the task upward when any of the following are true:
 
-- The user requests a full behavioral audit.
-- The design spans multiple steps or actors.
-- Trust, consent, or social pressure becomes central.
-- The request enters a high-stakes domain.
+- The user requests a full behavioral audit across an entire product or funnel.
+- The design coordinates multiple independent flows or cross-channel systems.
+- Trust, consent, or social pressure becomes the central design problem (not just one element).
+- The request enters a high-stakes domain (health, finance, legal, children, crisis, addiction).
+- The safety gate would trigger (fake scarcity, deceptive defaults, coercive patterns) → **always T3**.
+- The word "funnel," "architecture," or "retention loop" describes the entire task scope.
 
 Demote the task downward when the answer only needs one localized improvement.
+
+**T3 fast-track signals** (skip lower tiers, go directly to T3):
+- Any request involving deception, dark patterns, or fake social proof
+- Any request to design manipulation for a trust-sensitive population
 
 ## Mode Contract
 
@@ -132,6 +148,10 @@ Interpret modes after tiering.
 Run this gate before producing any design.
 
 ### Refuse or Redirect
+
+**Refuse** (not redirect) when the request itself IS the harmful pattern — i.e. the user is asking to build deceptive content, fake social proof, or coercive mechanics directly.
+
+**Redirect** when the user has a legitimate goal but reaches for an unsafe tactic — convert to a safe alternative instead.
 
 Refuse or redirect the request when it asks for, or clearly depends on:
 
@@ -219,8 +239,8 @@ Rank interventions as `High`, `Medium`, or `Low` priority unless the user explic
 
 ## Reference Routing
 
-Start with `references/model-index.md` when you need fast candidate selection.
-Then read only the files needed for the active tier.
+Use `references/model-index.md` only as a lookup index — do **not** cite it as a reference in your output. Always navigate to and cite the specific model or playbook file.
+Read only the files needed for the active tier.
 
 ### Core Models
 

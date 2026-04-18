@@ -1,19 +1,20 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: "Human OS semantic harness (Anthropic / Anthropic-compatible)"
+description: "Human OS semantic harness (Anthropic)"
+# Set in .env:
+#   ANTHROPIC_API_KEY = sk-ant-...
+#   ANTHROPIC_MODEL   = claude-haiku-4-5  (default)
 
 prompts:
   - file://prompts/system.md
 
 providers:
-  - id: "anthropic:messages:{{env.ANTHROPIC_MODEL | default('claude-sonnet-4-6')}}"
-    label: "{{env.ANTHROPIC_MODEL | default('claude-sonnet-4-6')}}"
-    config:
-      apiBaseUrl: "{{env.ANTHROPIC_BASE_URL | default('')}}"
+  - id: "anthropic:messages:{{env.ANTHROPIC_MODEL | default('claude-haiku-4-5')}}"
+    label: "{{env.ANTHROPIC_MODEL | default('claude-haiku-4-5')}}"
 
 tests: file://tests/cases.yaml
 
 commandLineOptions:
-  maxConcurrency: 1
+  maxConcurrency: 2
 
 defaultTest:
   options:

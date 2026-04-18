@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Human OS semantic harness (OpenRouter)"
+# Set in .env:
+#   OPENROUTER_API_KEY = sk-or-...
+#   OPENROUTER_MODEL   = meta-llama/llama-3.1-8b-instruct:free  (or any free model)
+
+prompts:
+  - file://prompts/system.md
+
+providers:
+  - id: "openai:chat:{{env.OPENROUTER_MODEL | default('meta-llama/llama-3.1-8b-instruct:free')}}"
+    label: "{{env.OPENROUTER_MODEL | default('meta-llama/llama-3.1-8b-instruct:free')}}"
+    config:
+      apiBaseUrl: https://openrouter.ai/api/v1
+      headers:
+        HTTP-Referer: https://github.com/skitse/Human-OS-Backdoor
+        X-Title: Human-OS-Backdoor Eval
+
+tests: file://tests/cases.yaml
+
+commandLineOptions:
+  maxConcurrency: 1
+
+defaultTest:
+  options:
+    transform: output.trim()
+  assert:
+    - type: python
+      value: file://scripts/assertions.py:decision_contract_assert
+
+outputPath: results/human-os-eval-openrouter.json

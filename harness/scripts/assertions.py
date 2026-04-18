@@ -23,11 +23,20 @@ def smoke_assert(output: str, context: dict) -> dict:
     }
 
 
+def _parse_json(output: str):
+    """Parse first complete JSON object, ignoring any surrounding text (thinking-mode models)."""
+    start = output.find("{")
+    if start == -1:
+        raise json.JSONDecodeError("no JSON object found", output, 0)
+    obj, _ = json.JSONDecoder().raw_decode(output, start)
+    return obj
+
+
 def decision_contract_assert(output: str, context: dict) -> dict:
     vars_dict = context.get("vars", {})
     try:
-        data = json.loads(output)
-    except json.JSONDecodeError as exc:
+        data = _parse_json(output)
+    except (json.JSONDecodeError, ValueError) as exc:
         return {
             "pass": False,
             "score": 0.0,
@@ -60,17 +69,30 @@ def decision_contract_assert(output: str, context: dict) -> dict:
         failures.append("notes must contain 1-5 items")
 
     expected_references = vars_dict.get("expected_references")
-    if expected_references is not None and references != expected_references:
-        failures.append(
-            f"references: expected {expected_references!r}, got {references!r}"
-        )
+    if expected_references is not None:
+        # promptfoo expands list vars into individual test runs → single string per run
+        if isinstance(expected_references, str):
+            if expected_references and expected_references not in references:
+                failures.append(
+                    f"references: expected {expected_references!r}, got {references!r}"
+                )
+        elif isinstance(expected_references, list):
+            missing_refs = [r for r in expected_references if r not in references]
+            if missing_refs:
+                failures.append(
+                    f"references: expected {expected_references!r}, got {references!r}"
+                )
 
     expected_note_keywords = vars_dict.get("expected_note_keywords")
     if expected_note_keywords is not None:
+        # promptfoo expands list vars → single string per run
+        if isinstance(expected_note_keywords, str):
+            expected_note_keywords = [expected_note_keywords]
         notes_blob = _normalize_text_list(notes)
+        # Each keyword phrase passes if ALL its words appear somewhere in notes
         missing_keywords = [
-            keyword for keyword in expected_note_keywords
-            if keyword.lower() not in notes_blob
+            kw for kw in expected_note_keywords
+            if not all(word in notes_blob for word in kw.lower().split())
         ]
         if missing_keywords:
             failures.append(

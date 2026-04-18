@@ -26,7 +26,7 @@ Don't use for: proofreading, translation, debugging, or tasks with no human deci
 git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 ```
 
-Or copy `skills/human-os/` into your Claude Code skills directory.
+The repo root is the skill itself — clone it wherever you want to load it from.
 
 Claude Code picks it up automatically on the next session.
 
@@ -162,19 +162,16 @@ Behavioral science gives you the mechanism. Whether it applies to your context i
 
 ```
 .
-├── SKILL.md                        # Skill definition (Claude Code entry point)
-├── skills/
-│   └── human-os/
-│       ├── SKILL.md
-│       └── references/
-│           ├── model-index.md
-│           ├── scan-protocol.md
-│           ├── anti-patterns.md
-│           ├── combo-patterns.md
-│           ├── models/             # 9 cognitive model files
-│           ├── domain-playbooks/   # 14 applied context files
-│           └── dialogues/          # 2 cross-disciplinary debate files
-└── harness/                        # Eval suite
+├── SKILL.md                    # Skill definition (Claude Code entry point)
+├── references/
+│   ├── model-index.md
+│   ├── scan-protocol.md
+│   ├── anti-patterns.md
+│   ├── combo-patterns.md
+│   ├── models/                 # 9 cognitive model files
+│   ├── domain-playbooks/       # 14 applied context files
+│   └── dialogues/              # 2 cross-disciplinary debate files
+└── harness/                    # Eval suite
     ├── tests/
     ├── scripts/
     └── promptfooconfig.yaml

@@ -26,7 +26,7 @@
 git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 ```
 
-或把 `skills/human-os/` 手动复制到你的 Claude Code skills 目录。
+整个仓库即是 skill 本体，clone 到哪里就从哪里加载。
 
 下次会话 Claude Code 自动加载。
 
@@ -162,19 +162,16 @@ python3 harness/scripts/run_eval.py
 
 ```
 .
-├── SKILL.md                        # Skill 定义（Claude Code 入口）
-├── skills/
-│   └── human-os/
-│       ├── SKILL.md
-│       └── references/
-│           ├── model-index.md
-│           ├── scan-protocol.md
-│           ├── anti-patterns.md
-│           ├── combo-patterns.md
-│           ├── models/             # 9 个认知模型
-│           ├── domain-playbooks/   # 14 个领域 playbook
-│           └── dialogues/          # 2 个跨领域辩论文件
-└── harness/                        # Eval 测试套件
+├── SKILL.md                    # Skill 定义（Claude Code 入口）
+├── references/
+│   ├── model-index.md
+│   ├── scan-protocol.md
+│   ├── anti-patterns.md
+│   ├── combo-patterns.md
+│   ├── models/                 # 9 个认知模型
+│   ├── domain-playbooks/       # 14 个领域 playbook
+│   └── dialogues/              # 2 个跨领域辩论文件
+└── harness/                    # Eval 测试套件
     ├── tests/
     ├── scripts/
     └── promptfooconfig.yaml

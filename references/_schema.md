@@ -30,7 +30,9 @@ shape is load-bearing.
 
 ```markdown
 ## {ID} · {English Name} {中文名}
-**Tier**: {核心|常用|情境} | **Evidence**: {A|B|C} — {依据} | **Effect**: {效应量 + 成立条件}
+**Tier**: {核心|常用|情境}
+**Evidence**: {A|B|C} — {依据}
+**Effect**: {效应量 + 成立条件}
 
 **机制链**: {刺激} → {认知/生理过程} → {行为输出}
 **剂量**: 弱 {…}；中 {…}；强 {…}；过载 {…}
@@ -40,6 +42,7 @@ shape is load-bearing.
 **可测代理**: {可落地的度量指标}
 **交互**: {× 其他机制 → 非线性后果}，引用 COMBO-xx
 **边界**: {伦理门槛 / 法律暴露 / 信任成本 / 不可用场景}
+**可证伪条件**: {什么观察会显示本记录在此不成立} → {该记录届时失去哪一句声称}
 ```
 
 ### Line discipline (mechanically enforced)
@@ -90,6 +93,29 @@ the same line as an earlier field, that is the bug, not the content.
 | `**可测代理**` | yes | Metrics obtainable without new instrumentation, or a named minimal experiment. |
 | `**交互**` | yes | At least one combo with the emergent effect named. May cite `combo-patterns.md`. |
 | `**边界**` | yes | Must state at least one condition where the mechanism must not be used, and why. |
+| `**可证伪条件**` | yes | What observation would show the record does not hold here, **and** which of its claims that would cost. A record that can never be wrong is a slogan, not a finding. Must name an observation and an outcome (不成立/不显著/降级/删除/推翻…), ≥30 chars. |
+
+### Why `可证伪条件` is required, not optional
+
+Every other field describes the mechanism. This one describes **the record's own death
+condition**, and it is what separates a knowledge base from a collection of persuasive
+paragraphs. `Evidence` grades how much is known; `失效信号` lists observable symptoms at the
+design level; `可证伪条件` names the measurement that would settle the question and the
+sentence that would then have to be struck.
+
+It is enforced for three reasons:
+
+1. **`SKILL.md` already promises it.** The evidence-grade legend tells the reader to "say
+   what would falsify it" for grade `B`. A promise with no field to say it in is a rule
+   stated only in prose — the exact defect class this schema exists to kill.
+2. **A body author demonstrated the silent-loss failure mode.** `Evidence` may end with
+   "可证伪条件见本记录下方独立一行"; if the renderer iterates only the canonical field list,
+   that line is dropped while every check stays green, leaving a self-referential dangling
+   promise. The checker now fails a record whose `Evidence` promises the line without one
+   carrying it.
+3. **It is the only field that constrains the other ten.** Without it, `剂量: 强` and
+   `Effect: 大` are unfalsifiable assertions, and the mechanics stack in `SKILL.md` inherits
+   that unfalsifiability into live design advice.
 
 ### Evidence grading
 
@@ -111,7 +137,9 @@ Copy this shape. Every v2 record should be substitutable for it field-for-field.
 
 ```markdown
 ## HB-02 · Loss Aversion 损失厌恶
-**Tier**: 核心 | **Evidence**: B — Kahneman & Tversky 1979 prospect theory; λ≈2.25 in Tversky & Kahneman 1992. Contested by Gal & Rucker 2018, who argue much of the evidence is a reference-point/reframing artifact rather than a general "losses loom larger" principle | **Effect**: Large (≈2× gain/loss asymmetry) but only when the reference point is already owned or expected; shrinks toward parity when the reference point is ambiguous or the loss is framed as a foregone gain
+**Tier**: 核心
+**Evidence**: B — Kahneman & Tversky 1979 prospect theory; λ≈2.25 in Tversky & Kahneman 1992. Contested by Gal & Rucker 2018, who argue much of the evidence is a reference-point/reframing artifact rather than a general "losses loom larger" principle
+**Effect**: Large (≈2× gain/loss asymmetry) but only when the reference point is already owned or expected; shrinks toward parity when the reference point is ambiguous or the loss is framed as a foregone gain
 
 **机制链**: 结果被置于既有参照点之下 → 负向偏离触发更强唤醒与注意分配 → 为避免确认损失而承担额外风险或成本
 **剂量**: 弱 一次性告知"将失去X" ；中 具体化已持有物+明确时限，配合可见的进度或资产 ；强 叠加社会比较（"同组只有你没完成"）并做成默认路径 ；过载 参照点被用户判定为虚构或每次触达都在喊损失 → 损失框架被重新归类为营销噪音，反向降低可信度并抬高后续真实损失的折扣率
@@ -144,6 +172,49 @@ Rules, mechanically enforced by `harness/scripts/check_consistency.py`:
 | Alias | Canonical | Why |
 |-------|-----------|-----|
 | HB-12 | PE-02 | 心理账户 / Mental Accounting — same mechanism, pricing file owns the depth |
+| SD-11 | TR-07 | Trust Transfer / 借来信任 — same mechanism (第三方背书作为核查捷径). TR-07 has the body and the regulatory boundary; SD-11 was a declared placeholder and must not be written as a second record |
+
+## Same-mechanism registry
+
+An alias collapses one ID into another and deletes a body. That is right when the two
+records are pure duplicates — and wrong when both bodies do real, different work. Four
+mechanisms in this repo have two bodies each: one states the mechanism at a general level
+and the other at the level a designer actually applies it, and deleting either loses
+content that the other does not carry.
+
+Those pairs are **groups** instead. Every member keeps its body, its evidence grade and its
+own `交互` edges; the group only declares that they are **one lever for accounting**.
+
+Why this needs a registry rather than a sentence in the prose: a mechanics stack that cites
+both `MR-12` (evidence A) and `AD-01` (evidence B) does not have two supports for its
+recommendation — it has one support counted twice, with the higher grade borrowed from the
+record that describes it better. Records already said so in their own `交互` fields
+("计功时不可叠加", "不要重复计数") and nothing enforced it, so the index advertised both.
+
+Rules, mechanically enforced by `harness/scripts/check_consistency.py`:
+
+- Every member must have a real body. A group accounts for records that exist; it does not
+  create them.
+- A group names at least two IDs, and no ID may appear in two groups.
+- A group names **which member to cite** (`Cite as`). Evidence grade is not the criterion —
+  `PE-04` carries the applied depth for endowment effect while `HB-09` carries the general
+  mechanism, and no heuristic can see that. The registry states it.
+- A member may not also be an alias — an alias already collapses the ID, so grouping it
+  again double-counts the fix.
+- The check is not only a registry: `find_duplicate_mechanisms()` also fails on any
+  unregistered pair that (a) declares in prose that it is the same mechanism, or (b) has
+  colliding names. Registering a group is the way to resolve the failure.
+- A clause stating that a *component* shares a structure is composition, not duplication
+  (`CM-34` legitimately contains `CM-01`'s deadline structure). Those are not grouped.
+
+| Group | Cite as | Why they are one lever |
+|-------|---------|------------------------|
+| `AD-01 + MR-12` | `AD-01` | 变动比率强化 — AD-01 讲机制与消退抵抗，MR-12 讲机制归属修正与滥用门槛。同一杠杆，计功一次 |
+| `HB-13 + CA-05` | `CA-05` | 时间贴现 — CA-05 是认知层抽象表述，HB-13 是它在行为层的表现；HB-13 自己写明"同一机制的不同抽象层级" |
+| `AD-10 + PA-04` | `AD-10` | 信息缺口 / 好奇心 — 名称互为倒装、同引 Loewenstein 1994；AD-10 偏情绪侧，PA-04 偏注意侧，计功一次 |
+| `HB-09 + PE-04` | `PE-04` | 禀赋效应 — HB-09 是通用机制（12 行），PE-04 是定价场景的可执行深度（61 行）；定价文件拥有应用层 |
+| `CM-02 + CM-05` | `CM-02` | 虚构稀缺 — 同在 manufactured-urgency.md，机制链与检测信号实质重叠；CM-02 细在数量指标，CM-05 细在陈述措辞 |
+| `CA-04 + PA-03` | `CA-04` | 选择性注意的分配规则 — 两条机制链实质相同（多线索竞争 → 按显著性与相关性分配 → 未中选者行为上等于不存在）；CA-04 持有复现良好的知觉层证据（A），PA-03 自己写明该层证据属于 CA-04，并补上 contingent capture 修正与应用层。计功一次 |
 
 ## Declared-but-unwritten registry
 
@@ -155,43 +226,14 @@ Rules, mechanically enforced:
 
 - An ID here must **not** have a body — write the body and remove the row.
 - The scan protocol and SKILL.md must not route to a declared-only ID.
-- `references/model-index.md` renders these in a separate, clearly-labelled section.
+- `references/model-index.md` **deliberately omits them.** The index advertises only bodies
+  that exist, so an ID missing from it means the mechanism does not exist. This is the
+  opposite of the earlier plan (render them in a labelled section) and was changed on
+  purpose: an index that lists unwritten mechanisms is how 34 phantom IDs drifted for
+  months. Coverage of the unwritten set is tracked here, in this registry, and nowhere else.
 
 | ID | Name | Family | Blocks |
 |----|------|--------|--------|
-| AD-04 | Emotional Contagion | AD | viral content, community tone |
-| AD-05 | Affective Forecasting Error | AD | subscription cancellation, onboarding promises |
-| AD-07 | Mere Exposure Effect | AD | brand repetition, ad frequency |
-| AD-09 | Nostalgia Effect | AD | legacy branding, retro campaigns |
-| AD-11 | Anticipatory Anxiety | AD | pre-launch, drop mechanics |
-| AD-12 | Hot-Cold Empathy Gap | AD | consent design, self-commitment tools |
-| AD-13 | Mood-Congruent Memory | AD | context priming, ad placement |
-| HB-06 | Availability Heuristic | HB | risk communication, testimonials |
-| HB-07 | Representativeness | HB | base-rate framing, market sizing |
-| HB-10 | Status Quo Bias | HB | migration, churn, opt-out design |
-| HB-14 | Optimism Bias | HB | trial promises, plan selection |
-| HB-15 | Confirmation Bias | HB | filter bubbles, community moderation |
-| HB-16 | Dunning-Kruger | HB | onboarding calibration, skill gating |
-| HB-17 | Gambler's Fallacy | HB | streak mechanics, pity timers |
-| HB-18 | Planning Fallacy | HB | project tools, deadline promises |
-| MR-02 | Implementation Intentions | MR | if-then plans, commitment UX |
-| MR-07 | Temptation Bundling | MR | habit pairing, wellness products |
-| MR-08 | Precommitment Devices | MR | savings, focus tools |
-| MR-09 | Ego Depletion | MR | friction placement, low-willpower windows |
-| MR-10 | Loss Frame Progress | MR | streak copy, progress framing |
-| PA-03 | Selective Attention | PA | salience, context matching |
-| PA-06 | Gestalt Principles | PA | layout, grouping, form design |
-| PA-07 | Visual Hierarchy Bias | PA | scan patterns, above-the-fold |
-| PA-09 | Change Blindness | PA | progressive disclosure, silent updates |
-| PA-11 | Color/Urgency Signaling | PA | urgency cues, accessibility limits |
-| PA-12 | Temporal Landmarks | PA | fresh-start campaigns, renewal timing |
-| SD-05 | Liking Principle | SD | affinity, similarity, rapport |
-| SD-07 | Conformity Effect | SD | norm formation, moderation |
-| SD-08 | Bandwagon Effect | SD | momentum claims, launch signals |
-| SD-09 | In-group/Out-group | SD | tribal identity, polarization risk |
-| SD-11 | Trust Transfer | SD | endorsement, marketplace sellers |
-| SD-12 | Betrayal Aversion | SD | breach response, dispute design |
-| SD-13 | Gossip / Signaling | SD | referral, social currency |
 
 `CA-06`/`CA-07` and the whole `PE-*` family are **canonical** and are no longer absent
 from the index; the same is true of `attention-economics` and `trust-architecture`,

@@ -146,7 +146,7 @@ Interpret modes after tiering.
 | `/scan` `扫描` | Scan First | Show the scan before design, even for smaller tasks. |
 | `/deep` `深度` | Full Drill | Expand to T3-style depth: scan, mechanism selection, implementation notes, risks. |
 | `/combo` `组合` | Combo Focus | Center the answer on mechanism combinations and interaction effects. |
-| `/defend` `防御` | Defense | Add abuse checks, mitigation, and trust-preserving alternatives for each strong lever. |
+| `/defend` `防御` | Defense | Add abuse checks, mitigation, and trust-preserving alternatives for each strong lever. Name the specific abuse vector you are defending against in `notes` — "defend mode applied" is not a defense. |
 
 Mode comes from the keyword, not from the request's topic. A dark-pattern audit or a
 safety review with no keyword is still `adaptive`; it simply runs the Safety Gate and the
@@ -155,13 +155,25 @@ the keyword.
 
 ## Safety Gate
 
-Run this gate before producing any design.
+Run this gate before producing any design. Its first output is not a design — it is a
+**decision**: allow, redirect, or refuse. Decide that before you write, then use the output
+contract for the branch you are in (see *Refusal and Redirect Output Contracts* below).
+Getting the branch right matters more than the wording: a redirect answered as a refusal
+drops the stack the user needed, and a refusal answered as a redirect ships the harm.
 
 ### Refuse or Redirect
 
-**Refuse** (not redirect) when the request itself IS the harmful pattern — i.e. the user is asking to build deceptive content, fake social proof, or coercive mechanics directly.
+Both branches can seem to apply, because a deceptive *request* always looks like "the request
+is the harmful pattern". Do not settle it here — the tie-break below is what decides, and it
+decides on what the harm is *for*, not on how the tactic is named.
 
-**Redirect** when the user has a legitimate goal but reaches for an unsafe tactic — convert to a safe alternative instead.
+**Refuse** when the harm *is* the deliverable — the artifact has no honest version, because it
+only works by misleading, coercing, or overriding the user's own stated preference.
+
+**Redirect** when the harm is a *means* to a goal worth serving — build the honest version of
+that goal instead of declining. This is the common case, and it includes requests that name a
+deceptive tactic outright: a false deadline used to unblock a real deal has a legitimate end,
+so the answer is the honest message, not a refusal.
 
 Tie-break — ask what the harm is *for*:
 
@@ -175,6 +187,13 @@ Tie-break — ask what the harm is *for*:
 
 A stated business goal does not by itself make a tactic redirectable. "Keep users engaged"
 is not a legitimate end when the engagement is the compulsion being requested.
+
+The list below is a **trigger list, not a branch decision**: it says the gate must act, not
+which action to take. The tie-break above is the only thing that decides refuse vs redirect,
+and it resolves in favour of redirect whenever an honest artifact serving the same end exists
+— even when the pattern named is fake urgency or a manufactured deadline. Reading the list
+and stopping there is the most common way to refuse something that should have been
+redirected.
 
 Refuse or redirect the request when it asks for, or clearly depends on:
 
@@ -202,7 +221,25 @@ For health, finance, legal, children, crisis, or other high-stakes contexts:
 - avoid dark patterns and pressure framing
 - explicitly mention risk, trust, and failure conditions
 
-### Refusal Output Contract
+### Refusal and Redirect Output Contracts
+
+**Refuse and redirect are different outputs. Read the right one.**
+A *refusal* declines the request; a *redirect* keeps it and swaps the tactic. The gate tells
+you which one you are in before you write anything — check that first, because emitting the
+refusal shape for a redirect silently deletes the design the user asked for.
+
+| | **Refuse** — harm *is* the deliverable | **Redirect** — harm is a *means* to a real goal |
+|---|---|---|
+| What you produce | a refusal: why it is out of bounds, what to build instead, the regulation | **the design**, with the unsafe tactic replaced and the substitution named |
+| `visible_stack` | `false` — there is no stack | **follows the tier** — `true` at T3, where the honest replacement gets designed |
+| `full_scan` | `false` | **follows the tier** |
+| `tier` | T3 (a refusal is always high-stakes) | unchanged — a T3 request redirected is still T3 |
+| `references` | the matching `refused-domains/` file | the model files that design the honest version, plus `scan-protocol.md` when `full_scan` is true |
+
+Crossing the rows is the failure to avoid: **a redirect answered in the refusal shape hands the
+user nothing to ship**, and a refusal answered as a design ships the harm. If a safety-gate
+trigger made you emit no stack, check which branch you were actually in — only a refusal
+removes the stack.
 
 A refusal is not a design. When the gate refuses, the output changes shape — do not emit a
 mechanics stack for something you are declining to build.
@@ -227,10 +264,20 @@ Rules for a refusal:
   send the user to the mechanism analysis, not to a search.
 - Always offer the honest alternative. A bare refusal leaves the user to find a worse vendor.
 
-A redirect is different: the user has a legitimate goal and an unsafe tactic, so the output
-keeps the full tier-appropriate shape — `visible_stack` and `full_scan` follow the tier as
-normal, the tactic is replaced, and the substitution is named. Refusal is the only case
-where the stack disappears.
+### Redirect Output Contract
+
+When the gate redirects, the user has a legitimate goal and an unsafe tactic — so **build the
+thing**. The output keeps the full tier-appropriate shape:
+
+- `visible_stack` and `full_scan` follow the tier as normal, including `true` at T3. The
+  stack is where the honest replacement gets designed; dropping it turns a redirect into a
+  refusal and hands the user nothing to ship.
+- Name the substitution explicitly: which unsafe tactic was replaced, and by what.
+- The tier does not drop because the tactic changed. A T3 request redirected to a safe tactic
+  is still T3 work with a T3 stack, T3 scan, and a safe rollout note.
+
+Refusal is the **only** case where the stack disappears. If you are redirecting and you
+produced no stack, you produced a refusal — redo it.
 
 ## Workflow
 
@@ -257,9 +304,9 @@ Use this structure:
 [Design / Critique / Plan]
 
 ━━ BEHAVIORAL MECHANICS STACK ━━━━━━━━━━━━━━━━━━━━━━━━
-⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal]
+⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal] · Falsified by: [the record's **可证伪条件**]
     -> [how it helps here]
-⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal]
+⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal] · Falsified by: [the record's **可证伪条件**]
     -> [how it helps here]
 ⚡ [COMBO-xx] [Model A] x [Model B] -> [interaction]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -277,14 +324,32 @@ Use this structure:
 [Risks, Boundary Conditions, Safe Rollout Notes]
 
 ━━ BEHAVIORAL MECHANICS STACK ━━━━━━━━━━━━━━━━━━━━━━━━
-⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal]
+⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal] · Falsified by: [the record's **可证伪条件**]
     -> [how it helps here]
-⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal]
+⟐ [ID] [Model] · Evidence [A|B|C] · Dose [弱|中|强] · Stop: [failure signal] · Falsified by: [the record's **可证伪条件**]
     -> [how it helps here]
 ⚡ [COMBO-xx] [Model A] x [Model B] -> [interaction]
 ✕ [ID] [Model] ruled out by: [the record's 边界 condition]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+**One mechanism is one line.** Some records describe the same lever at two levels of
+abstraction (`HB-13` hyperbolic discounting and `CA-05` temporal discounting), or with one
+file owning the applied depth (`HB-09` and `PE-04`). Listing both does not give the stack two
+supports — it counts one lever twice and borrows the higher evidence grade. The same-mechanism
+groups are declared in `references/_schema.md`; when you cite a record that appears in one,
+cite it once and keep the grade of the member that actually carries the depth.
+
+**If any mechanism drives the design, the stack is not empty.** `visible_stack` and the
+stack itself are one decision: an answer that emits no stack must be one where no mechanism
+was used, which is only true at T0 or for a refusal. "Behavioural reasoning informed the
+answer" always leaves at least one line to write — if you reasoned from a mechanism, it
+belongs in the stack. Never set `visible_stack: true` and then emit no stack.
+
+**The stack is part of the answer, not a plan for later.** Write it in the same response
+that gives the design. "The stack will be populated once the scan runs" is never correct: you
+have already chosen which levers the recommendation rests on, and that choice is what the
+stack reports. If the answer recommends specific mechanisms, they are in the stack now.
 
 **Every field in the stack is copied from the mechanism record, never invented.**
 `Evidence` is the record's own grade and its named source; `Dose` is the band you are
@@ -302,10 +367,24 @@ Evidence grades mean:
 Do not invent leverage scores, confidence decimals, or star ratings. Evidence grade plus
 dose band plus stop signal is the honest version of the same information.
 
+**Only real mechanism IDs may go in the stack.** Every `[ID]` must be a record that exists in
+`references/model-index.md`, or a `COMBO-nn` from `references/combo-patterns.md`. Nothing else
+has an ID: playbooks have no IDs, `references/anti-patterns.md` has no IDs, and a file
+abbreviation is not an ID (`TA-` is not trust-architecture, `DP-` is not dark-patterns, `LT-`
+is not linguistic-triggers). If you want to name something from a playbook, name the playbook
+in `references` and describe the tactic in words in `notes` — do not mint an ID for it. An
+invented ID is worse than no ID: it carries an evidence grade and a stop signal, so it reads
+like a grounded citation while pointing at nothing.
+
 ## Reference Routing
 
 Use `references/model-index.md` only as a lookup index — do **not** cite it as a reference in your output. Always navigate to and cite the specific model or playbook file.
 Read only the files needed for the active tier.
+
+**Cite the whole path, exactly as written above.** Every entry in this section shows the
+complete repo-relative path; a path with the `models/` or `domain-playbooks/` segment dropped
+resolves to nothing. A citation that cannot be opened is worse than no citation, because the
+reader trusts it. Copy the path from this section rather than retyping it from memory.
 
 ### Core Models
 
@@ -388,8 +467,9 @@ Use `references/domain-playbooks/behavioral-finance.md` only for fintech and mon
 For every recommendation:
 
 1. Map it to a concrete mechanism by ID, from a file that exists.
-2. Carry forward the record's **dose band** and its **failure signal** — a recommendation
-   with no ceiling and no stop condition is not finished.
+2. Carry forward the record's **dose band**, its **failure signal**, and its
+   **可证伪条件** (the test that would refute the mechanism here) — a recommendation with no
+   ceiling, no stop condition, and no stated way to be proven wrong is not finished.
 3. State at least one boundary condition when the lever is strong or risky, taken from the
    record's **边界**.
 4. Report the **evidence grade honestly** (A/B/C with its source). Do not upgrade a `C`

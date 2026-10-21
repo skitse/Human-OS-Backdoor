@@ -17,6 +17,8 @@ Run: python3 harness/scripts/replay_checks.py
 """
 
 import copy
+import re
+from functools import lru_cache
 import json
 from pathlib import Path
 
@@ -28,6 +30,33 @@ from assertions import decision_contract_assert
 ROOT = Path(__file__).resolve().parents[2]
 CASES_PATH = ROOT / "harness" / "tests" / "cases.yaml"
 FIXTURES_PATH = ROOT / "harness" / "fixtures" / "replay_outputs.json"
+
+
+@lru_cache(maxsize=1)
+def _same_mechanism_groups() -> tuple[dict, ...]:
+    """Read the same-mechanism groups from references/_schema.md (see assertions.py)."""
+    schema = ROOT / "references" / "_schema.md"
+    if not schema.exists():
+        return ()
+    row = re.compile(
+        r"^\|\s*`?([A-Z]{2}-\d{2}(?:\s*[+·]\s*[A-Z]{2}-\d{2})*)`?\s*\|"
+        r"\s*`?([A-Z]{2}-\d{2})`?\s*\|"
+    )
+    groups: list[dict] = []
+    in_section = False
+    for line in schema.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            in_section = "Same-mechanism" in line
+            continue
+        if not in_section:
+            continue
+        match = row.match(line)
+        if match:
+            groups.append({
+                "members": [m.strip() for m in re.split(r"[+·]", match.group(1)) if m.strip()],
+                "cite": match.group(2).strip(),
+            })
+    return tuple(groups)
 
 
 def mutations_for(fixture: dict, vars_dict: dict) -> list[tuple[str, dict]]:
@@ -74,6 +103,39 @@ def mutations_for(fixture: dict, vars_dict: dict) -> list[tuple[str, dict]]:
     # A valid-length note that carries none of the expected vocabulary isolates it.
     if str(vars_dict.get("expected_note_keywords", "")).strip():
         mutate("notes valid but off-vocabulary", notes=["Okay."])
+
+    # The stack assertions are new, so the self-test must prove they can reject. Without
+    # these mutations a broken stack check would pass every fixture that happens to omit it.
+    stack = fixture.get("stack")
+    if isinstance(stack, list) and stack:
+        # Only a VISIBLE stack must be non-empty. Where `visible_stack` is false the stack
+        # is the answer's private bookkeeping and emptying it changes nothing the contract
+        # grades — asserting a rejection there would be the self-test inventing a rule.
+        if fixture.get("visible_stack") is True:
+            mutate("stack emptied while visible", stack=[])
+        broken = copy.deepcopy(fixture)
+        first = broken["stack"][0]
+        first.pop("stop", None)
+        out.append(("stack line loses its stop signal", broken))
+        broken2 = copy.deepcopy(fixture)
+        broken2["stack"][0]["evidence"] = "high"
+        out.append(("stack line carries a non-grade evidence value", broken2))
+        # A stack line with no falsifier is the shape the v2 upgrade exists to eliminate.
+        broken4 = copy.deepcopy(fixture)
+        broken4["stack"][0].pop("falsified_by", None)
+        out.append(("stack line loses its falsification condition", broken4))
+        # Double-counting a same-mechanism group: append the group's other member.
+        for group in _same_mechanism_groups():
+            cited = [str(item.get("id", "")).strip() for item in stack if isinstance(item, dict)]
+            if group["cite"] in cited:
+                other = [m for m in group["members"] if m != group["cite"]]
+                if other:
+                    broken3 = copy.deepcopy(fixture)
+                    broken3["stack"] = broken3["stack"] + [
+                        {"id": other[0], "dose": "中", "evidence": "B", "stop": "x"}
+                    ]
+                    out.append(("stack counts one lever twice", broken3))
+                break
 
     return out
 

@@ -41,16 +41,38 @@ CONTRACT_KEYS = (
     "visible_stack",
     "full_scan",
     "references",
+    "stack",
     "notes",
 )
 
 
 def extract_contract(raw: str) -> dict:
-    """Pull the first JSON object out of a model response (tolerates prose preamble)."""
-    start = raw.find("{")
-    if start < 0:
+    """Pull the contract JSON object out of a model response (tolerates prose preamble).
+
+    Identified by its key set rather than by "the first `{`": a thinking-mode model sketches
+    JSON fragments while deliberating, and one real run's reasoning contained
+    ``{"id": "LT-01", ...}`` thousands of characters before the answer. Taking the first
+    object froze that fragment as the fixture — a fixture that then asserts nothing about
+    the contract, since none of the contract keys are in it.
+    """
+    decoder = json.JSONDecoder()
+    best = None
+    index = raw.find("{")
+    while index != -1:
+        try:
+            obj, _ = decoder.raw_decode(raw, index)
+        except json.JSONDecodeError:
+            index = raw.find("{", index + 1)
+            continue
+        if isinstance(obj, dict):
+            if all(key in obj for key in CONTRACT_KEYS):
+                return obj
+            if best is None or len(obj) > len(best):
+                best = obj
+        index = raw.find("{", index + 1)
+    if best is None:
         raise ValueError("no JSON object in model output")
-    return json.JSONDecoder().raw_decode(raw, start)[0]
+    return best
 
 
 def response_text(run: dict) -> str:

@@ -63,6 +63,33 @@ def main() -> int:
     if missing_safety:
         failures.append(f"missing safety actions: {sorted(missing_safety)}")
 
+    # cases.yaml's own header says `metadata` must agree with `vars`, because when the two
+    # disagree the file documents two contracts for the same case. A rule stated only in a
+    # comment is not a rule: nothing verified it until this check existed.
+    mismatches = []
+    for case in cases:
+        metadata = case.get("metadata", {})
+        case_vars = case.get("vars", {})
+        for meta_key, var_key in (
+            ("tier", "expected_tier"),
+            ("mode", "expected_mode"),
+            ("safety", "expected_safety_action"),
+        ):
+            if meta_key not in metadata or var_key not in case_vars:
+                continue
+            # A `|` in vars means the case accepts several answers; metadata names one of
+            # them, which is consistent, not contradictory.
+            accepted = [a.strip() for a in str(case_vars[var_key]).split("|")]
+            if str(metadata[meta_key]) not in accepted:
+                mismatches.append(
+                    f"{case.get('description')}: metadata.{meta_key}="
+                    f"{metadata[meta_key]!r} but vars.{var_key}="
+                    f"{case_vars[var_key]!r}"
+                )
+    if mismatches:
+        failures.append("metadata disagrees with vars:")
+        failures.extend(f"  {m}" for m in mismatches)
+
     if failures:
         print("COVERAGE REPORT FAILED")
         for failure in failures:

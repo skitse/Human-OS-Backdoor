@@ -8,6 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 
 COMMANDS = [
+    ["python3", "harness/scripts/check_consistency.py"],
     ["python3", "harness/scripts/static_checks.py"],
     ["python3", "harness/scripts/check_packaged_skill.py"],
     ["python3", "harness/scripts/replay_checks.py"],

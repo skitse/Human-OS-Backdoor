@@ -33,6 +33,12 @@ CONFIGS = {
     "openrouter":  HARNESS / "promptfooconfig.openrouter.yaml",
 }
 
+# Pinned on purpose. `@latest` silently changed behaviour between runs: 0.124.1 stopped
+# resolving `file://` vars the way 0.121.5 did and broke every case with "No files found
+# for variable skill_md". An eval whose runner version floats cannot be compared to an
+# earlier eval, so the version is part of the experiment.
+PROMPTFOO_VERSION = "0.121.5"
+
 FILTER_KEYS = {"category", "tier", "mode", "safety"}
 ENV_REQUIREMENTS = {
     "openai":      "OPENAI_API_KEY",
@@ -52,8 +58,25 @@ def filter_cases(cases, filter_key=None, filter_value=None):
 
 
 def write_temp_cases(cases):
+    """Write filtered cases, rewriting `file://` vars to absolute URIs.
+
+    promptfoo resolves a `file://` var relative to the --tests file's directory, so a
+    filtered copy placed anywhere other than the original location silently breaks
+    `skill_md: file://../SKILL.md` with "No files found for variable skill_md".
+    Rewriting to absolute keeps filtering independent of where the temp file lives.
+    """
+    rewritten = []
+    for case in cases:
+        case = {**case, "vars": dict(case.get("vars", {}))}
+        for key, value in list(case["vars"].items()):
+            if isinstance(value, str) and value.startswith("file://"):
+                absolute = (CASES_PATH.parent / value[len("file://"):]).resolve()
+                if absolute.exists():
+                    case["vars"][key] = absolute.as_uri()
+        rewritten.append(case)
+
     temp_path = HARNESS / "tests" / ".tmp-filtered-cases.yaml"
-    temp_path.write_text(yaml.safe_dump(cases, sort_keys=False, allow_unicode=True))
+    temp_path.write_text(yaml.safe_dump(rewritten, sort_keys=False, allow_unicode=True))
     return temp_path
 
 
@@ -101,7 +124,11 @@ def main(argv):
     temp_cases = write_temp_cases(selected_cases)
     config_path = CONFIGS[provider]
 
-    command = ["npx", "promptfoo@latest", "eval",
+    # --no-cache: promptfoo otherwise replays a previous run's model outputs and re-grades
+    # them, which reports a score for text the current SKILL.md may never have produced.
+    # An eval that can be served from cache is not a measurement of the current skill.
+    command = ["npx", f"promptfoo@{PROMPTFOO_VERSION}", "eval",
+               "--no-cache",
                "--config", str(config_path),
                "--tests",  str(temp_cases)]
 

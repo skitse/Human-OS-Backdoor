@@ -69,7 +69,7 @@ git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 
 ### 认知模型 (`references/models/`)
 
-9 个模型，覆盖人的信息处理、决策和行动机制：
+9 个模型文件、共 71 条机制记录，每条都带完整的 v2 字段集（证据等级及其出处、机制链、剂量带、时间动态、调节变量、失效信号、可测代理、交互、边界）：
 
 | 文件 | 内容 |
 |------|------|
@@ -88,6 +88,12 @@ git clone https://github.com/skitse/Human-OS-Backdoor ~/.claude/skills/human-os
 14 个应用场景：
 
 `saas-products` · `social-commerce` · `viral-growth-loops` · `games-gamification` · `community-social` · `content-hooks` · `video-content-psychology` · `linguistic-triggers` · `cultural-psychology` · `sales-psychology` · `interpersonal-persuasion` · `meme-engineering` · `behavioral-finance` · `dark-patterns`
+
+### 拒绝域 (`references/refused-domains/`)
+
+四个只用于**识别、审计与防御**的领域，绝不作为操作指南。每条记录都带机制链、危害画像（具体受害者与损失）、检测信号、个体/平台/监管三级防御动作，以及已经在管辖它的法规条款：
+
+`manufactured-urgency` · `compulsion-loops` · `narrative-control` · `stakeholder-pressure`
 
 ### 辅助参考
 
@@ -140,10 +146,18 @@ python3 harness/scripts/run_all_checks.py
 python3 harness/scripts/check_packaged_skill.py
 
 # 完整评测（需要 ANTHROPIC_API_KEY 或 OPENAI_API_KEY）
-python3 harness/scripts/run_eval.py
+python3 harness/scripts/run_eval.py openrouter   # 或 openai / anthropic
 ```
 
-测试覆盖：级别分类、模式行为、安全门决策、参考文件路由，约 30 个标注 case。
+测试覆盖：级别分类、模式行为、安全门决策、参考文件路由、v2 字段完整性，共 22 个标注 case。
+
+三条硬规则，缺一条这个套件就会像以前那样"全绿但没测到东西"：
+
+1. **case 里所有值都是标量，不能写 YAML 列表。** promptfoo 会把列表型变量展开成笛卡尔积的多次运行，一个 case 悄悄变成 N 行、每行只检查一项——这个仓库过去的 "50/50 通过" 就是 18 个 case 摊成 50 行算出来的。标量保证一个 case 一次运行，分母无法被灌水。
+2. **fixture 必须由 `build_replay_fixtures.py` 从真实评测记录生成**，不许手写。手写的 fixture 全是正例，无法区分"契约被满足"和"断言永远通过"。
+3. **replay 门自带负例自检**：它会把每个 fixture 按契约改坏（翻转 trigger、改错 tier、清空 notes……），然后要求断言层把每一处改动都判为失败。只要有一处改动被放过，门就是红的——那说明断言有洞。当前 195 处违约全部被正确拒绝。
+
+`run_eval.py` 固定 promptfoo 版本并强制 `--no-cache`：版本浮动会让两次评测不可比，缓存则会把上一次的模型输出重新打分，等于拿旧文本的分数冒充当前文本。
 
 ---
 
@@ -168,7 +182,9 @@ python3 harness/scripts/run_eval.py
 │   ├── scan-protocol.md
 │   ├── anti-patterns.md
 │   ├── combo-patterns.md
-│   ├── models/                 # 9 个认知模型
+│   ├── _schema.md              # v2 记录契约（字段定义 + 迁移配方 + 注册表）
+│   ├── models/                 # 9 个模型文件 / 71 条机制记录
+│   ├── refused-domains/        # 4 个拒绝域（机制/危害/检测/防御/监管）
 │   ├── domain-playbooks/       # 14 个领域 playbook
 │   └── dialogues/              # 2 个跨领域辩论文件
 └── harness/                    # Eval 测试套件

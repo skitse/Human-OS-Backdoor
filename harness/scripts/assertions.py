@@ -1,4 +1,7 @@
 import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def _normalize_text_list(items):
@@ -56,11 +59,27 @@ def decision_contract_assert(output: str, context: dict) -> dict:
     for key, expected in checks:
         if expected is None:
             continue
-        if data.get(key) != expected:
+        # `a|b` in a scalar expectation means both are defensible answers under SKILL.md.
+        # Where the contract genuinely fixes one value the case states one value; where a
+        # careful reader could argue for two, the test must not grade the tie-break.
+        alternatives = [alt.strip() for alt in str(expected).split("|")]
+        if str(data.get(key)) not in alternatives:
             failures.append(f"{key}: expected {expected!r}, got {data.get(key)!r}")
 
     references = data.get("references", [])
     notes = data.get("notes", [])
+
+    # Every cited path must exist. A model that invents `references/fake-urgency.md` is
+    # not "close enough" — it is reporting evidence it never read, and the SKILL.md
+    # contract says every reference must be a file that exists. Without this check the
+    # eval happily passes output citing files that were never written.
+    if isinstance(references, list):
+        invented = [
+            ref for ref in references
+            if isinstance(ref, str) and ref.strip() and not (ROOT / ref).exists()
+        ]
+        if invented:
+            failures.append(f"references cite paths that do not exist: {invented!r}")
     if not isinstance(references, list) or not all(isinstance(item, str) for item in references):
         failures.append("references must be a list of strings")
     if not isinstance(notes, list) or not all(isinstance(item, str) for item in notes):
@@ -70,29 +89,42 @@ def decision_contract_assert(output: str, context: dict) -> dict:
 
     expected_references = vars_dict.get("expected_references")
     if expected_references is not None:
-        # promptfoo expands list vars into individual test runs → single string per run
+        # Cases declare this as a `;`-separated STRING, not a YAML list. promptfoo turns
+        # every list-valued var into a Cartesian product of separate runs, so a list here
+        # silently multiplied one case into N runs that each checked one reference — the
+        # headline "50/50" was 50 rows over 18 cases. A scalar keeps one case = one run.
+        # Within one `;`-slot, `|` separates acceptable alternatives: where two files are
+        # both defensible routes under SKILL.md, the test must accept either, or it grades
+        # a preference the contract never fixed.
         if isinstance(expected_references, str):
-            if expected_references and expected_references not in references:
-                failures.append(
-                    f"references: expected {expected_references!r}, got {references!r}"
-                )
-        elif isinstance(expected_references, list):
-            missing_refs = [r for r in expected_references if r not in references]
-            if missing_refs:
-                failures.append(
-                    f"references: expected {expected_references!r}, got {references!r}"
-                )
+            slots = [s.strip() for s in expected_references.split(";") if s.strip()]
+        else:
+            slots = [str(s) for s in expected_references]
+        missing_refs = [
+            slot for slot in slots
+            if not any(alt.strip() in references for alt in slot.split("|"))
+        ]
+        if missing_refs:
+            failures.append(
+                f"references: expected {slots!r}, got {references!r}"
+            )
 
     expected_note_keywords = vars_dict.get("expected_note_keywords")
     if expected_note_keywords is not None:
-        # promptfoo expands list vars → single string per run
+        # Also a `;`-separated scalar for the same expansion reason as references.
+        # Within one phrase, `a|b` means either alternative satisfies it: the contract
+        # fixes the DECISION, so the test must not grade the model's vocabulary.
         if isinstance(expected_note_keywords, str):
-            expected_note_keywords = [expected_note_keywords]
+            phrases = [p.strip() for p in expected_note_keywords.split(";") if p.strip()]
+        else:
+            phrases = list(expected_note_keywords)
         notes_blob = _normalize_text_list(notes)
-        # Each keyword phrase passes if ALL its words appear somewhere in notes
         missing_keywords = [
-            kw for kw in expected_note_keywords
-            if not all(word in notes_blob for word in kw.lower().split())
+            phrase for phrase in phrases
+            if not any(
+                all(word in notes_blob for word in alternative.lower().split())
+                for alternative in phrase.split("|")
+            )
         ]
         if missing_keywords:
             failures.append(

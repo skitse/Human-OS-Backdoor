@@ -1,6 +1,6 @@
 # Build Status — Human OS Knowledge Base
 
-Last updated: 2026-04-18
+Last updated: 2026-10-21
 
 ---
 
@@ -36,13 +36,27 @@ Last updated: 2026-04-18
 | `references/dialogues/neuroscience-x-growth-debate.md` | 神经科学 vs 增长黑客跨领域辩论，10个碰撞洞察 |
 | `references/dialogues/sales-x-narrative-debate.md` | 销售心理学 vs 叙事心理学跨领域辩论，聚焦成交、身份、异议与故事张力 |
 | `references/scan-protocol.md` | 扫描协议 |
-| `references/model-index.md` | 模型索引 |
+| `references/model-index.md` | **生成物**，不是手写文件。由 `check_consistency.py --write-index` 从真实记录渲染，索引里出现一行就意味着有一条对应记录存在 |
+| `references/_schema.md` | v2 记录契约：11 个必填字段的定义与校验规则、黄金样例、v1→v2 迁移配方、别名注册表、已声明未写注册表 |
 
 ---
 
-## 🚫 被拒绝执行（伦理边界）
+## 🚫 曾被拒绝的四个域 — 现状
 
-这些任务被 subagent 主动拒绝，**不会重跑**，原因记录如下：
+这四项在 v1 被 subagent 拒绝。v2 的做法是：**不写操作手册，写可审计的机制档案**——机制链、证据等级与出处、危害画像、检测信号、防御动作（个人/平台/监管三层）、监管环境（法域 + 条款）。落盘于 `references/refused-domains/`，共 36 条 CM 记录：
+
+| 文件 | 记录数 | 覆盖 |
+|------|--------|------|
+| `manufactured-urgency.md` | 12 | 伪造稀缺/倒计时/排队/社会认同造假/损失框架催促 |
+| `compulsion-loops.md` | 8 | 可变比率、损失厌恶式追投、streak 断裂恐惧、沉没成本锁定 |
+| `narrative-control.md` | 8 | 叙事劫持、虚假争议、信源损毁、身份对立嫁接 |
+| `stakeholder-pressure.md` | 8 | 伪造危机、威胁放大、信息不对称施压 |
+
+关键取舍：这四域**战术效能被系统性高估**。反应阻抗（Brehm）使得伪造紧迫一旦被识破就反向；"让目标以为是自己决定的"是背叛厌恶（SD-12）最强的触发条件，下行风险远大于上行。因此记录里每条都写明失效信号与检测方式，而不是写成可执行的目标导向序列。原始拒绝理由保留如下，作为历史记录。
+
+## 🚫 v1 原始拒绝记录（历史）
+
+这些任务在 v1 被 subagent 主动拒绝，原因记录如下：
 
 ### 1. Hype Engineer — Buzz 制造与叙事控制
 - **拒绝原因**：包含"叙事劫持技术"（通过欺骗而非实质劫持媒体叙事）、"主动制造争议获取流量"（制造虚假冲突）、"信息不对称操控"（故意扭曲信息）
@@ -64,9 +78,6 @@ Last updated: 2026-04-18
 
 ## 📋 待写文件（尚未规划）
 
-根据知识库整体结构，以下内容可能有价值但尚未规划：
-
 - `references/dialogues/pricing-x-community-debate.md` — 定价心理 × 社区经济对话
-- `references/models/neurochemistry-reward.md` — 伦理版神经化学（聚焦用户福祉而非操控）
-- `references/domain-playbooks/strategy-influence.md` — 伦理版利益相关者影响手册
-- `references/domain-playbooks/narrative-communication.md` — 伦理版叙事传播手册
+
+（v1 这里列的 `neurochemistry-reward.md`、`strategy-influence.md`、`narrative-communication.md` 三项，v2 已按"机制+危害+检测+防御+监管"的形态并入 `references/refused-domains/`，不再作为独立 playbook 存在——playbook 的形态是"怎么做"，而这四项需要的形态是"怎么认出来、怎么挡"。）
